@@ -11,4 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ChatService.Models\ChatService.Models.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
 </Project>

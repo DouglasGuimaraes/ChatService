@@ -1,7 +1,6 @@
 /Users/dmguimaraes/Projects/ChatService/ChatService.Models/bin/Debug/netcoreapp3.1/ChatService.Models.deps.json
 /Users/dmguimaraes/Projects/ChatService/ChatService.Models/bin/Debug/netcoreapp3.1/ChatService.Models.dll
 /Users/dmguimaraes/Projects/ChatService/ChatService.Models/bin/Debug/netcoreapp3.1/ChatService.Models.pdb
-/Users/dmguimaraes/Projects/ChatService/ChatService.Models/obj/Debug/netcoreapp3.1/ChatService.Models.csprojAssemblyReference.cache
 /Users/dmguimaraes/Projects/ChatService/ChatService.Models/obj/Debug/netcoreapp3.1/ChatService.Models.AssemblyInfoInputs.cache
 /Users/dmguimaraes/Projects/ChatService/ChatService.Models/obj/Debug/netcoreapp3.1/ChatService.Models.AssemblyInfo.cs
 /Users/dmguimaraes/Projects/ChatService/ChatService.Models/obj/Debug/netcoreapp3.1/ChatService.Models.csproj.CoreCompileInputs.cache

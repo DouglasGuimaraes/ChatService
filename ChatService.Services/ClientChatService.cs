@@ -4,21 +4,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using ChatService.Models.AbsModels.ChatConnection;
-using ChatService.Models.Interfaces;
+using ChatService.Models.Models;
+using ChatService.Services.Interfaces;
 
-namespace ChatService.Models.Models
+namespace ChatService.Services
 {
-    public class ChatConnection : IChatConnection
+    public class ClientChatService : IClientChatService
     {
-
-        private readonly IChatMessages _chatMessages;
-
-        
-        public ChatConnection(IChatMessages chatMessages)
-        {
-            _chatMessages = chatMessages;
-        }
-
         public string IpAddressNumber { get; set; }
         public StreamWriter Writer { get; set; }
         public StreamReader Reader { get; set; }
@@ -26,6 +18,11 @@ namespace ChatService.Models.Models
         public Thread ThreadMessage { get; set; }
         public IPAddress IpAddress { get; set; }
         public bool Connected { get; set; }
+
+        public ClientChatService()
+        {
+            IpAddressNumber = "192.168.0.18";
+        }
 
         public ChatConnectionResult Connect(ChatUser user)
         {
@@ -50,7 +47,7 @@ namespace ChatService.Models.Models
                 Writer.Flush();
 
                 //Inicia a thread para receber mensagens e nova comunicação
-                ThreadMessage = new Thread(new ThreadStart(_chatMessages.GetMessages));
+                ThreadMessage = new Thread(new ThreadStart(GetMessages));
                 ThreadMessage.Start();
 
                 result = new ChatConnectionResult(true);
@@ -69,6 +66,10 @@ namespace ChatService.Models.Models
             try
             {
                 Connected = false;
+                Reader.Close();
+                Writer.Close();
+                TcpClient.Close();
+
                 result = new ChatConnectionResult(true);
             }
             catch (Exception ex)
@@ -77,6 +78,46 @@ namespace ChatService.Models.Models
             }
 
             return result;
+        }
+
+        public void SendMessage(string message, string user = "")
+        {
+            if (!string.IsNullOrEmpty(message))
+            {   //escreve a mensagem da caixa de texto
+                Writer.WriteLine(message);
+                Writer.Flush();
+            }
+        }
+
+        private void GetMessages()
+        {
+            // recebe a resposta do servidor
+            var reader = new StreamReader(TcpClient.GetStream());
+            string ConResposta = reader.ReadLine();
+            // Se o primeiro caracater da resposta é 1 a conexão foi feita com sucesso
+            if (ConResposta[0] == '1')
+            {
+                // Atualiza o formulário para informar que esta conectado
+                Console.WriteLine("Connected successfully!");
+            }
+            else // Se o primeiro caractere não for 1 a conexão falhou
+            {
+                string reason = "Not connected: ";
+                // Extrai o motivo da mensagem resposta. O motivo começa no 3o caractere
+                reason += ConResposta.Substring(2, ConResposta.Length - 2);
+                // Atualiza o formulário como o motivo da falha na conexão
+                Console.WriteLine(reason);
+                // Sai do método
+                return;
+            }
+
+            // Enquanto estiver conectado le as linhas que estão chegando do servidor
+            while (Connected)
+            {
+                // exibe mensagems no Textbox
+                var list = reader.ReadLine();
+                Console.WriteLine(list);
+            }
         }
 
     }

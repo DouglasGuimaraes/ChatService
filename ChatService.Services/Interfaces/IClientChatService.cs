@@ -6,23 +6,21 @@ using System.Threading;
 using ChatService.Models.AbsModels.ChatConnection;
 using ChatService.Models.Models;
 
-namespace ChatService.Models.Interfaces
+namespace ChatService.Services.Interfaces
 {
-    public interface IChatConnection
+    public interface IClientChatService
     {
-
-
         string IpAddressNumber { get; set; }
+        bool Connected { get; set; }
+
         StreamWriter Writer { get; set; }
         StreamReader Reader { get; set; }
         TcpClient TcpClient { get; set; }
-
         Thread ThreadMessage { get; set; }
         IPAddress IpAddress { get; set; }
 
-        bool Connected { get; set; }
-
         ChatConnectionResult Connect(ChatUser user);
         ChatConnectionResult Disconnect(ChatUser user);
+        void SendMessage(string message, string user = "");
     }
 }

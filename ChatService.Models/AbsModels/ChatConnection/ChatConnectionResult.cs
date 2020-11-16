@@ -4,6 +4,7 @@ namespace ChatService.Models.AbsModels.ChatConnection
     public class ChatConnectionResult
     {
         public bool Success { get; set; }
+        public string Reason { get; set; }
         public Exception Exception { get; set; }
 
         public ChatConnectionResult(bool success)
