@@ -1,0 +1,37 @@
+﻿<Properties StartupConfiguration="{FCCC4190-8302-4908-A1E4-F54968A5A0EE}|Default">
+  <MonoDevelop.Ide.ItemProperties.ChatService PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.ItemProperties.ChatService.Models FirstBuild="True" />
+  <MonoDevelop.Ide.ItemProperties.ChatService.Services FirstBuild="True" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ChatService.Models/Models/ChatConnection.cs">
+    <Files>
+      <File FileName="ChatService.Models/Interfaces/IChatUser.cs" Line="7" Column="41" />
+      <File FileName="ChatService.Models/Models/ChatUser.cs" Line="8" Column="45" />
+      <File FileName="ChatService.Models/Models/ChatConnection.cs" Line="24" Column="38" />
+      <File FileName="ChatService.Services/DependencyInjectionService.cs" Line="10" Column="44" />
+      <File FileName="ChatService/Program.cs" Line="10" Column="22" />
+      <File FileName="ChatService.Models/Models/ChatMessages.cs" Line="9" Column="38" />
+      <File FileName="ChatService.Models/Interfaces/IChatConnection.cs" Line="7" Column="22" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="ChatService" expanded="True">
+            <Node name="ChatService" expanded="True" />
+            <Node name="ChatService.Models" expanded="True">
+              <Node name="Interfaces" expanded="True" />
+              <Node name="Models" expanded="True">
+                <Node name="ChatConnection.cs" selected="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
