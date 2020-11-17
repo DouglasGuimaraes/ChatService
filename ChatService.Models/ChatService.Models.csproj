@@ -11,5 +11,7 @@
     <Folder Include="AbsModels\ChatConnection\" />
     <Folder Include="Constants\" />
     <Folder Include="Constants\UserGuide\" />
+    <Folder Include="Constants\ServerChatService\" />
+    <Folder Include="AbsModels\IpAddressService\" />
   </ItemGroup>
 </Project>

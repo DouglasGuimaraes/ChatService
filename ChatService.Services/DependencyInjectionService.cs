@@ -1,10 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using ChatService.Models.Interfaces;
-using ChatService.Models.Models;
+﻿using ChatService.Infra.Services;
+using ChatService.Infra.Services.Interfaces;
 using ChatService.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatService.Services
 {
@@ -17,6 +14,7 @@ namespace ChatService.Services
                    .AddSingleton<IClientChatService, ClientChatService>()
                    .AddSingleton<IServerChatService, ServerChatService>()
                    .AddSingleton<IUserGuideService, UserGuideService>()
+                   .AddSingleton<IIpAddressService, IpAddressService>()
                    .BuildServiceProvider();
         }
     }

@@ -66,7 +66,7 @@ namespace ChatService
         private static string SetWelcome()
         {
             Console.WriteLine("*** Welcome to our chat service!");
-            Console.WriteLine("*** Please set your Nickname:");
+            Console.WriteLine("*** Please set your nickname:");
             return Console.ReadLine();
         }
 
@@ -116,27 +116,21 @@ namespace ChatService
                 Console.WriteLine("");
                 Console.WriteLine(" > HELP command:");
                 proxy.Help();
-            }
 
-            var users = message.ToUpper().Contains(UserGuideConstants.USERS.ToUpper());
-            if (users)
-            {
-                var proxy = serviceProvider.GetService<IUserGuideService>();
                 Console.WriteLine("");
-                Console.WriteLine(" > USERS command:");
-                //proxy.Help();
+                Console.WriteLine(" > END of HELP command:");
+                Console.WriteLine(" > Type any key to back to the chat.");
+                Console.ReadKey();
             }
 
             var exit = message.ToUpper().Contains(UserGuideConstants.EXIT.ToUpper());
             if (exit)
             {
-                var proxy = serviceProvider.GetService<IUserGuideService>();
-                Console.WriteLine("");
-                Console.WriteLine(" > EXIT command:");
-                //proxy.Help();
+                var proxy = serviceProvider.GetService<IClientChatService>();
+                proxy.Disconnect();
             }
 
-            return helper || users || exit;
+            return helper || exit;
         }
 
         #endregion

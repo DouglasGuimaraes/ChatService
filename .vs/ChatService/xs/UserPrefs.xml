@@ -1,0 +1,31 @@
+﻿<Properties StartupConfiguration="{2A21997B-E877-4543-80B4-65584729D07A}|Default">
+  <MonoDevelop.Ide.ItemProperties.ChatService PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.ItemProperties.ChatService.Server PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ChatService.Services/ServerChatService.cs">
+    <Files>
+      <File FileName="ChatService/Program.cs" Line="69" Column="53" />
+      <File FileName="ChatService.Services/ServerChatService.cs" Line="14" Column="52" />
+      <File FileName="ChatService.Services/ClientChatService.cs" Line="87" Column="30" />
+      <File FileName="ChatService.Services/ChatConnectionService.cs" Line="99" Column="49" />
+      <File FileName="ChatService.Services/Interfaces/IServerChatService.cs" Line="20" Column="55" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="ChatService" expanded="True">
+            <Node name="ChatService.Services" expanded="True">
+              <Node name="Interfaces" expanded="True" />
+              <Node name="ServerChatService.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

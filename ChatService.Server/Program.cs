@@ -33,6 +33,8 @@ namespace ChatService.Server
                 var proxy = serviceProvider.GetService<IServerChatService>();
                 proxy.StartServer();
 
+                Console.WriteLine("*** Server started successfully.");
+
             }
             catch (Exception ex)
             {

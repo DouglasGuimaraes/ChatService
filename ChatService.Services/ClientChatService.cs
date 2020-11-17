@@ -60,7 +60,7 @@ namespace ChatService.Services
             return result;
         }
 
-        public ChatConnectionResult Disconnect(ChatUser user)
+        public ChatConnectionResult Disconnect()
         {
             ChatConnectionResult result;
             try
@@ -98,7 +98,7 @@ namespace ChatService.Services
             if (ConResposta[0] == '1')
             {
                 // Atualiza o formulário para informar que esta conectado
-                Console.WriteLine("Connected successfully!");
+                Console.WriteLine("Connected successfully to the chat!");
             }
             else // Se o primeiro caractere não for 1 a conexão falhou
             {

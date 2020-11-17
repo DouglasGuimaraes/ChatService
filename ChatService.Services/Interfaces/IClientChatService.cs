@@ -20,7 +20,7 @@ namespace ChatService.Services.Interfaces
         IPAddress IpAddress { get; set; }
 
         ChatConnectionResult Connect(ChatUser user);
-        ChatConnectionResult Disconnect(ChatUser user);
+        ChatConnectionResult Disconnect();
         void SendMessage(string message, string user = "");
     }
 }

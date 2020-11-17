@@ -5,12 +5,16 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using ChatService.Infra.Services.Interfaces;
+using ChatService.Models.Constants.ServerChatService;
 using ChatService.Services.Interfaces;
 
 namespace ChatService.Services
 {
     public class ServerChatService : IServerChatService
     {
+        private readonly IIpAddressService _ipAddressService;
+
         private const int _MaxUsers = 15;
 
         public static Hashtable Users { get; set; }
@@ -22,11 +26,12 @@ namespace ChatService.Services
         public TcpListener TcpListener { get; set; }
         public Thread ThreadListener { get; set; }
 
-        public ServerChatService()
+        public ServerChatService(IIpAddressService ipAddressService)
         {
-            Users = new Hashtable(_MaxUsers);
-            Connections = new Hashtable(_MaxUsers);
-            IpAddressNumber = "192.168.0.18";
+            _ipAddressService = ipAddressService;
+            Users = new Hashtable(ServerChatServiceConstants.MAX_USERS);
+            Connections = new Hashtable(ServerChatServiceConstants.MAX_USERS);
+            IpAddressNumber = _ipAddressService.GetLocalIp().IpAddress;
             IpAddress = IPAddress.Parse(IpAddressNumber);
         }
 
@@ -37,8 +42,9 @@ namespace ChatService.Services
             Connections.Add(tcpClient, nickname);
 
             // Informa a nova conexão para todos os usuário e para o formulário do servidor
-            UpdateServerInformation($"{Connections[tcpClient]} entrou.");
-            
+            string newConnectionText = $"{Connections[tcpClient]} entrou.";
+            UpdateServerAndUsers(newConnectionText);
+
         }
 
         public void RemoveUser(TcpClient tcpClient)
@@ -47,7 +53,8 @@ namespace ChatService.Services
             if (Connections[tcpClient] != null)
             {
                 // Primeiro mostra a informação e informa os outros usuários sobre a conexão
-                UpdateServerInformation($"{Connections[tcpClient]} saiu.");
+                string userLefttext = $"{Connections[tcpClient]} saiu.";
+                UpdateServerAndUsers(userLefttext);
 
                 // Removeo usuário da hash table
                 Users.Remove(Connections[tcpClient]);
@@ -55,20 +62,42 @@ namespace ChatService.Services
             }
         }
 
-        public void SendMessage(string source, string message, string user = "")
+        public void SendMessage(string source, string message)
         {
-            
-            string fullMessage = $"{source} disse: {message}.";
-            // Primeiro exibe a mensagem na aplicação
-            UpdateServerInformation(fullMessage);
+            string fullMessage = string.Empty;
 
-            if (string.IsNullOrEmpty(user))
-                SendMessageToAllUsers(fullMessage);
-            else
-                SendMessageToSpecificUser(fullMessage, user, source);
+            var messageContent = message.Split("|||");
+            var mesageContentCount = messageContent.Count();
+
+            // Public message
+            if (mesageContentCount == 1)
+            {
+                fullMessage = $"{source} send to all: {message}.";
+                UpdateServerInformation(fullMessage);
+                SendPublicMessage(fullMessage);
+            }
+            // Public message to one user
+            else if (mesageContentCount == 2)
+            {
+                string publicUser = messageContent[0];
+                string publicMessage = messageContent[1];
+                fullMessage = $"{source} send to {publicUser}: {publicMessage}.";
+                UpdateServerInformation(fullMessage);
+                SendPublicMessage(fullMessage);
+            }
+            // Private message to specific user
+            else if (mesageContentCount == 3)
+            {
+                string privateUser = messageContent[0];
+                string privateMessage = messageContent[1];
+                fullMessage = $"{source} send to {privateUser} (private): {privateMessage}.";
+                UpdateServerInformation(fullMessage);
+                SendPrivateMessage(fullMessage, messageContent[0]);
+            }
+
         }
 
-        public void SendMessageToAllUsers(string message)
+        public void SendPublicMessage(string message)
         {
             StreamWriter swSenderSender;
 
@@ -102,7 +131,7 @@ namespace ChatService.Services
             }
         }
 
-        public void SendMessageToSpecificUser(string message, string user, string source)
+        public void SendPrivateMessage(string message, string user)
         {
             StreamWriter swSenderSender;
 
@@ -138,7 +167,6 @@ namespace ChatService.Services
             }
         }
 
-
         public void StartServer()
         {
             // Pega o IP do primeiro dispostivo da rede
@@ -173,6 +201,12 @@ namespace ChatService.Services
         private void UpdateServerInformation(string message)
         {
             Console.WriteLine(message);
+        }
+
+        private void UpdateServerAndUsers(string message)
+        {
+            UpdateServerInformation(message);
+            SendPublicMessage(message);
         }
     }
 }

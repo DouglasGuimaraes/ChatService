@@ -54,7 +54,7 @@ namespace ChatService.Services
                 if (ServerChatService.Users.Contains(usuarioAtual) == true)
                 {
                     // 0 => significa não conectado
-                    swEnviador.WriteLine("0|Este nome de usuário já existe.");
+                    swEnviador.WriteLine("0|This is nickname already exists in the chat.");
                     swEnviador.Flush();
                     CloseConnection();
                     return;
@@ -62,7 +62,7 @@ namespace ChatService.Services
                 else if (usuarioAtual == "Administrator")
                 {
                     // 0 => não conectado
-                    swEnviador.WriteLine("0|Este nome de usuário é reservado.");
+                    swEnviador.WriteLine("0|Wow! You can't be the Administrator! hehe");
                     swEnviador.Flush();
                     CloseConnection();
                     return;

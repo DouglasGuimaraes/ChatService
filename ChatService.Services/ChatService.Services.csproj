@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ChatService.Models\ChatService.Models.csproj" />
+    <ProjectReference Include="..\ChatService.Infra\ChatService.Infra.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />

@@ -17,7 +17,7 @@ namespace ChatService.Services.Interfaces
 
         void AddUser(TcpClient tcpClient, string nickname);
         void RemoveUser(TcpClient tcpClient);
-        void SendMessage(string source, string message, string user = "");
+        void SendMessage(string source, string message);
         void StartServer();
         void KeepServer();
     }
