@@ -31,8 +31,11 @@ namespace ChatService.Services
             _ipAddressService = ipAddressService;
             Users = new Hashtable(ServerChatServiceConstants.MAX_USERS);
             Connections = new Hashtable(ServerChatServiceConstants.MAX_USERS);
-            IpAddressNumber = _ipAddressService.GetLocalIp().IpAddress;
-            IpAddress = IPAddress.Parse(IpAddressNumber);
+
+            var getIpAddress = _ipAddressService.GetLocalIp();
+
+            IpAddressNumber = getIpAddress.Success ? getIpAddress.IpAddress : "192.168.0.18";
+            IpAddress =  IPAddress.Parse(IpAddressNumber);
         }
 
         public void AddUser(TcpClient tcpClient, string nickname)

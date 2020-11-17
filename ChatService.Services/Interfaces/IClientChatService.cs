@@ -21,6 +21,6 @@ namespace ChatService.Services.Interfaces
 
         ChatConnectionResult Connect(ChatUser user);
         ChatConnectionResult Disconnect();
-        void SendMessage(string message, string user = "");
+        void SendMessage(string message);
     }
 }

@@ -80,7 +80,7 @@ namespace ChatService.Services
             return result;
         }
 
-        public void SendMessage(string message, string user = "")
+        public void SendMessage(string message)
         {
             if (!string.IsNullOrEmpty(message))
             {   //escreve a mensagem da caixa de texto

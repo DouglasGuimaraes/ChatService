@@ -13,5 +13,6 @@
     <Folder Include="Constants\UserGuide\" />
     <Folder Include="Constants\ServerChatService\" />
     <Folder Include="AbsModels\IpAddressService\" />
+    <Folder Include="AbsModels\ClientProgram\" />
   </ItemGroup>
 </Project>
