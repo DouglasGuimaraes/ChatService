@@ -6,7 +6,7 @@ using ChatService.Services.Interfaces;
 
 namespace ChatService.Services
 {
-    public class Conexao
+    public class ChatConnectionService
     {
         private readonly IServerChatService _serverChatService;
 
@@ -19,18 +19,18 @@ namespace ChatService.Services
         private string strResposta;
 
         // O construtor da classe que que toma a conexão TCP
-        public Conexao(TcpClient tcpCon, IServerChatService serverChatService)
+        public ChatConnectionService(TcpClient tcpCon, IServerChatService serverChatService)
         {
             tcpCliente = tcpCon;
             // A thread que aceita o cliente e espera a mensagem
-            thrSender = new Thread(AceitaCliente);
+            thrSender = new Thread(AcceptClient);
             // A thread chama o método AceitaCliente()
             thrSender.Start();
 
             _serverChatService = serverChatService;
         }
 
-        private void FechaConexao()
+        private void CloseConnection()
         {
             // Fecha os objetos abertos
             tcpCliente.Close();
@@ -39,7 +39,7 @@ namespace ChatService.Services
         }
 
         // Ocorre quando um novo cliente é aceito
-        private void AceitaCliente()
+        private void AcceptClient()
         {
             srReceptor = new System.IO.StreamReader(tcpCliente.GetStream());
             swEnviador = new System.IO.StreamWriter(tcpCliente.GetStream());
@@ -56,7 +56,7 @@ namespace ChatService.Services
                     // 0 => significa não conectado
                     swEnviador.WriteLine("0|Este nome de usuário já existe.");
                     swEnviador.Flush();
-                    FechaConexao();
+                    CloseConnection();
                     return;
                 }
                 else if (usuarioAtual == "Administrator")
@@ -64,7 +64,7 @@ namespace ChatService.Services
                     // 0 => não conectado
                     swEnviador.WriteLine("0|Este nome de usuário é reservado.");
                     swEnviador.Flush();
-                    FechaConexao();
+                    CloseConnection();
                     return;
                 }
                 else
@@ -79,7 +79,7 @@ namespace ChatService.Services
             }
             else
             {
-                FechaConexao();
+                CloseConnection();
                 return;
             }
             //

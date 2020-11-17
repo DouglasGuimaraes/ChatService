@@ -16,6 +16,7 @@ namespace ChatService.Services
                 services
                    .AddSingleton<IClientChatService, ClientChatService>()
                    .AddSingleton<IServerChatService, ServerChatService>()
+                   .AddSingleton<IUserGuideService, UserGuideService>()
                    .BuildServiceProvider();
         }
     }

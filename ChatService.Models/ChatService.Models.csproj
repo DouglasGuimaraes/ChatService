@@ -9,5 +9,7 @@
     <Folder Include="Models\" />
     <Folder Include="AbsModels\" />
     <Folder Include="AbsModels\ChatConnection\" />
+    <Folder Include="Constants\" />
+    <Folder Include="Constants\UserGuide\" />
   </ItemGroup>
 </Project>

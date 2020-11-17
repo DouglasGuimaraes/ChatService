@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -56,11 +57,20 @@ namespace ChatService.Services
 
         public void SendMessage(string source, string message, string user = "")
         {
-            StreamWriter swSenderSender;
-
+            
             string fullMessage = $"{source} disse: {message}.";
             // Primeiro exibe a mensagem na aplicação
             UpdateServerInformation(fullMessage);
+
+            if (string.IsNullOrEmpty(user))
+                SendMessageToAllUsers(fullMessage);
+            else
+                SendMessageToSpecificUser(fullMessage, user, source);
+        }
+
+        public void SendMessageToAllUsers(string message)
+        {
+            StreamWriter swSenderSender;
 
             // Cria um array de clientes TCPs do tamanho do numero de clientes existentes
             TcpClient[] tcpClientes = new TcpClient[Users.Count];
@@ -81,7 +91,7 @@ namespace ChatService.Services
 
                     // Envia a mensagem para o usuário atual no laço
                     swSenderSender = new StreamWriter(tcpClientes[i].GetStream());
-                    swSenderSender.WriteLine(fullMessage);
+                    swSenderSender.WriteLine(message);
                     swSenderSender.Flush();
                     swSenderSender = null;
                 }
@@ -91,6 +101,43 @@ namespace ChatService.Services
                 }
             }
         }
+
+        public void SendMessageToSpecificUser(string message, string user, string source)
+        {
+            StreamWriter swSenderSender;
+
+            var findUser = Users[user];
+
+            if(findUser != null && findUser is TcpClient)
+            {
+                var tcpClient = findUser as TcpClient;
+                try
+                {
+
+                    // Se a mensagem estiver em branco ou a conexão for nula sai...
+                    if (message.Trim() == "")
+                    {
+                        return;
+                    }
+
+                    // Envia a mensagem para o usuário atual no laço
+                    swSenderSender = new StreamWriter(tcpClient.GetStream());
+                    swSenderSender.WriteLine(message);
+                    swSenderSender.Flush();
+                    swSenderSender = null;
+                }
+                catch (Exception ex)
+                {
+                    RemoveUser(tcpClient);
+                }
+                
+            }
+            else
+            {
+                
+            }
+        }
+
 
         public void StartServer()
         {
@@ -119,7 +166,7 @@ namespace ChatService.Services
                 // Aceita uma conexão pendente
                 var tcpClient = TcpListener.AcceptTcpClient();
                 // Cria uma nova instância da conexão
-                Conexao newConnection = new Conexao(tcpClient, this);
+                var newConnection = new ChatConnectionService(tcpClient, this);
             }
         }
 

@@ -13,11 +13,11 @@ namespace ChatService.Server
         {
             serviceProvider = RegisterDependencyInjection();
 
-            StartServer();
-
             Console.WriteLine("*** Server's starting...");
 
-            Console.WriteLine("Hello World!");
+            StartServer();
+
+            
         }
 
         private static ServiceProvider RegisterDependencyInjection()
@@ -28,8 +28,17 @@ namespace ChatService.Server
 
         private static void StartServer()
         {
-            var proxy = serviceProvider.GetService<IServerChatService>();
-            proxy.StartServer();
+            try
+            {
+                var proxy = serviceProvider.GetService<IServerChatService>();
+                proxy.StartServer();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("*** ERROR:");
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }

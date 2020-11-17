@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using ChatService.Models.AbsModels.ChatConnection;
+using ChatService.Models.Constants.UserGuide;
 using ChatService.Models.Interfaces;
 using ChatService.Services;
 using ChatService.Services.Interfaces;
@@ -32,6 +33,7 @@ namespace ChatService
 
             if (connection.Success)
             {
+                Console.WriteLine("*** User the command /help to list all the commands available to you.");
                 Console.WriteLine("*** SEND YOUR MESSAGE:");
                 while (true)
                 {
@@ -77,8 +79,21 @@ namespace ChatService
 
         private static void SendMessage(string message, string user = "")
         {
-            var proxy = serviceProvider.GetService<IClientChatService>();
-            proxy.SendMessage(message, user);
+            try
+            {
+                var reservatedKey = CheckReservatedKey(message);
+
+                if(!reservatedKey)
+                { 
+                    var proxy = serviceProvider.GetService<IClientChatService>();
+                    proxy.SendMessage(message, user);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("*** CONNECTION ERROR:");
+                Console.WriteLine(ex.Message);
+            }
 
         }
 
@@ -90,6 +105,38 @@ namespace ChatService
                 return split[0];
             else
                 return "";
+        }
+
+        private static bool CheckReservatedKey(string message)
+        {
+            var helper = message.ToUpper().Contains(UserGuideConstants.HELP.ToUpper());
+            if (helper)
+            {
+                var proxy = serviceProvider.GetService<IUserGuideService>();
+                Console.WriteLine("");
+                Console.WriteLine(" > HELP command:");
+                proxy.Help();
+            }
+
+            var users = message.ToUpper().Contains(UserGuideConstants.USERS.ToUpper());
+            if (users)
+            {
+                var proxy = serviceProvider.GetService<IUserGuideService>();
+                Console.WriteLine("");
+                Console.WriteLine(" > USERS command:");
+                //proxy.Help();
+            }
+
+            var exit = message.ToUpper().Contains(UserGuideConstants.EXIT.ToUpper());
+            if (exit)
+            {
+                var proxy = serviceProvider.GetService<IUserGuideService>();
+                Console.WriteLine("");
+                Console.WriteLine(" > EXIT command:");
+                //proxy.Help();
+            }
+
+            return helper || users || exit;
         }
 
         #endregion
