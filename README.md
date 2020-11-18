@@ -4,6 +4,22 @@
 
 Projeto de chat (cliente x servidor) utilizando o protocolo TCP para as conexões.
 
+### Funcionalidades
+
+Dentre as funcionalidades básicas solicitadas, todas foram atendidas:
+
+- Registro de apelido
+- Envio de mensagem pública para a sala
+- Envio de mensagem pública para um usuário
+- Sair do bate-papo
+
+Dentre as opcionais, as duas primeiras não foram implementadas:
+
+- Criação de nova sala
+- Trocar de sala
+- Ajuda ao usuário (sobre os comandos)
+- Enviar uma mensagem privada para um usuário da sala
+
 ## Arquitetura do Projeto
 
 Os respectivos projetos foram criados utilizando .Net Core 3.1.
