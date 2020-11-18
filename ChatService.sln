@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatService.Server", "ChatS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatService.Infra", "ChatService.Infra\ChatService.Infra.csproj", "{F419B343-47FD-4F8F-AFFA-03DA83F96C47}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatService.Tests", "ChatService.Tests\ChatService.Tests.csproj", "{5B282AA7-27FA-4BBC-A791-E5D766F7283C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,5 +39,9 @@ Global
 		{F419B343-47FD-4F8F-AFFA-03DA83F96C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F419B343-47FD-4F8F-AFFA-03DA83F96C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F419B343-47FD-4F8F-AFFA-03DA83F96C47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B282AA7-27FA-4BBC-A791-E5D766F7283C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B282AA7-27FA-4BBC-A791-E5D766F7283C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B282AA7-27FA-4BBC-A791-E5D766F7283C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B282AA7-27FA-4BBC-A791-E5D766F7283C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

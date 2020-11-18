@@ -14,13 +14,12 @@ namespace ChatService.Services.Interfaces
         bool Connected { get; set; }
 
         StreamWriter Writer { get; set; }
-        StreamReader Reader { get; set; }
         TcpClient TcpClient { get; set; }
         Thread ThreadMessage { get; set; }
         IPAddress IpAddress { get; set; }
 
         ChatConnectionResult Connect(ChatUser user);
         ChatConnectionResult Disconnect();
-        void SendMessage(string message);
+        ChatConnectionResult SendMessage(string message);
     }
 }

@@ -15,7 +15,6 @@ namespace ChatService.Services
         #region [ FIELDS & PROPERTIES ]
         public string IpAddressNumber { get; set; }
         public StreamWriter Writer { get; set; }
-        public StreamReader Reader { get; set; }
         public TcpClient TcpClient { get; set; }
         public Thread ThreadMessage { get; set; }
         public IPAddress IpAddress { get; set; }
@@ -81,9 +80,14 @@ namespace ChatService.Services
             try
             {
                 Connected = false;
-                Reader.Close();
                 Writer.Close();
                 TcpClient.Close();
+
+                Writer.Dispose();
+                TcpClient.Dispose();
+
+                Writer = null;
+                TcpClient = null;
 
                 result = new ChatConnectionResult(true);
             }
@@ -99,13 +103,30 @@ namespace ChatService.Services
         /// Send message to the server.
         /// </summary>
         /// <param name="message"></param>
-        public void SendMessage(string message)
+        public ChatConnectionResult SendMessage(string message)
         {
-            if (!string.IsNullOrEmpty(message))
-            {   
-                Writer.WriteLine(message);
-                Writer.Flush();
+            ChatConnectionResult result = null;
+            try
+            {            
+                if (!string.IsNullOrEmpty(message))
+                {   
+                    Writer.WriteLine(message);
+                    Writer.Flush();
+
+                    result = new ChatConnectionResult(true);
+                }
+                else
+                {
+                    result = new ChatConnectionResult(false);
+                }
+
             }
+            catch (Exception ex)
+            {
+                result = new ChatConnectionResult(ex);
+            }
+
+            return result;
         }
 
         #endregion
@@ -140,6 +161,8 @@ namespace ChatService.Services
                 // Check if the reason was based on the "User Already Taken" to restart the process
                 if(reason.Contains("This is nickname already exists in the chat"))
                     UserAlreadyTaken = true;
+
+                //ThreadMessage.Abort();
                 
                 return;
             }

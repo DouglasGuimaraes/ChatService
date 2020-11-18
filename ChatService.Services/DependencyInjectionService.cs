@@ -22,5 +22,21 @@ namespace ChatService.Services
                    .AddSingleton<IIpAddressService, IpAddressService>()
                    .BuildServiceProvider();
         }
+
+        /// <summary>
+        /// Configure all services in the DI for Testing Purpose
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static ServiceProvider ConfigureServicesTransient(IServiceCollection services)
+        {
+            return
+                services
+                   .AddTransient<IClientChatService, ClientChatService>()
+                   .AddTransient<IServerChatService, ServerChatService>()
+                   .AddTransient<IUserGuideService, UserGuideService>()
+                   .AddTransient<IIpAddressService, IpAddressService>()
+                   .BuildServiceProvider();
+        }
     }
 }
