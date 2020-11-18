@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 namespace ChatService.Tests
 {
+    [Collection("ChatService")]
     public class ClientChatServiceTests
     {
 

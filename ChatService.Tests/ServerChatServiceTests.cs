@@ -9,6 +9,7 @@ using System.Net.Sockets;
 
 namespace ChatService.Tests
 {
+    [Collection("ChatService")]
     public class ServerChatServiceTests
     {
         private static ServiceProvider serviceProvider;
