@@ -8,7 +8,10 @@ namespace ChatService.Infra.Services
 {
     public class IpAddressService : IIpAddressService
     {
-
+        /// <summary>
+        /// Get local IP of the machine.
+        /// </summary>
+        /// <returns></returns>
         public GetLocalIpResult GetLocalIp()
         {
             GetLocalIpResult result = null;

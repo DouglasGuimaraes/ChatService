@@ -17,9 +17,12 @@ namespace ChatService.Server
 
             StartServer();
 
-            
         }
 
+        /// <summary>
+        /// Method responsible to add the DI in the project accessing the Dependency Injection Service
+        /// </summary>
+        /// <returns></returns>
         private static ServiceProvider RegisterDependencyInjection()
         {
             var serviceCollection = new ServiceCollection();
@@ -33,13 +36,16 @@ namespace ChatService.Server
                 var proxy = serviceProvider.GetService<IServerChatService>();
                 proxy.StartServer();
 
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine("*** Server started successfully.");
-
+                Console.ResetColor();
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine("*** ERROR:");
                 Console.WriteLine(ex.Message);
+                Console.ResetColor();
             }
         }
     }

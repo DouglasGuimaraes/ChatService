@@ -13,6 +13,8 @@ namespace ChatService.Services
 {
     public class ServerChatService : IServerChatService
     {
+        #region [ FIELDS & PROPERTIES ]
+
         private readonly IIpAddressService _ipAddressService;
 
         private const int _MaxUsers = 15;
@@ -26,56 +28,86 @@ namespace ChatService.Services
         public TcpListener TcpListener { get; set; }
         public Thread ThreadListener { get; set; }
 
+        #endregion
+
+        #region [ CONSTRUCTOR ]
+
         public ServerChatService(IIpAddressService ipAddressService)
         {
             _ipAddressService = ipAddressService;
+
+            // Hash table with the max users
             Users = new Hashtable(ServerChatServiceConstants.MAX_USERS);
+
+            // Has table with the max connections
             Connections = new Hashtable(ServerChatServiceConstants.MAX_USERS);
 
+            // Get local IP
             var getIpAddress = _ipAddressService.GetLocalIp();
 
+            // If GetLocalIp was not sucessfully, set the IP manually
             IpAddressNumber = getIpAddress.Success ? getIpAddress.IpAddress : "192.168.0.18";
             IpAddress =  IPAddress.Parse(IpAddressNumber);
         }
 
+        #endregion
+
+        #region [ METHODS ]
+
+        #region [ PUBLIC ]
+
+        /// <summary>
+        /// Add user in the Hash Tables and inform the new connection to all users.
+        /// </summary>
+        /// <param name="tcpClient"></param>
+        /// <param name="nickname"></param>
         public void AddUser(TcpClient tcpClient, string nickname)
         {
-            // Primeiro inclui o nome e conexão associada para ambas as hash tables
             Users.Add(nickname, tcpClient);
             Connections.Add(tcpClient, nickname);
 
-            // Informa a nova conexão para todos os usuário e para o formulário do servidor
-            string newConnectionText = $"{Connections[tcpClient]} entrou.";
+            string newConnectionText = $"{Connections[tcpClient]} has joined.";
             UpdateServerAndUsers(newConnectionText);
 
         }
 
+        /// <summary>
+        /// Remove user from the Hash Tables and inform all users about it
+        /// </summary>
+        /// <param name="tcpClient"></param>
         public void RemoveUser(TcpClient tcpClient)
         {
-            // Se o usuário existir
+            // If user already exists
             if (Connections[tcpClient] != null)
             {
-                // Primeiro mostra a informação e informa os outros usuários sobre a conexão
-                string userLefttext = $"{Connections[tcpClient]} saiu.";
+                string userLefttext = $"{Connections[tcpClient]} left.";
                 UpdateServerAndUsers(userLefttext);
 
-                // Removeo usuário da hash table
                 Users.Remove(Connections[tcpClient]);
                 Connections.Remove(tcpClient);
             }
         }
 
+        /// <summary>
+        /// Send message based on the configuration (public or privately)
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="message"></param>
         public void SendMessage(string source, string message)
         {
             string fullMessage = string.Empty;
 
+            // Split the messages using |||
+            // Count = 1 => Public Message
+            // Count = 2 => Public Message to One User
+            // Count = 3 => Private Message to Specific User
             var messageContent = message.Split("|||");
             var mesageContentCount = messageContent.Count();
 
             // Public message
             if (mesageContentCount == 1)
             {
-                fullMessage = $"{source} send to all: {message}.";
+                fullMessage = $"{source} says to all: {message}";
                 UpdateServerInformation(fullMessage);
                 SendPublicMessage(fullMessage);
             }
@@ -84,85 +116,187 @@ namespace ChatService.Services
             {
                 string publicUser = messageContent[0];
                 string publicMessage = messageContent[1];
-                fullMessage = $"{source} send to {publicUser}: {publicMessage}.";
-                UpdateServerInformation(fullMessage);
-                SendPublicMessage(fullMessage);
+                fullMessage = $"{source} says to {publicUser}: {publicMessage}";
+
+                var userExists = CheckIfUserExists(publicUser);
+                if (userExists)
+                {
+                    UpdateServerInformation(fullMessage);
+                    SendPublicMessage(fullMessage);
+                }
+                else
+                {
+                    SendServerPrivateMessage(ServerChatServiceConstants.USER_NOT_FOUND, source);
+                }
+                
             }
             // Private message to specific user
             else if (mesageContentCount == 3)
             {
                 string privateUser = messageContent[0];
                 string privateMessage = messageContent[1];
-                fullMessage = $"{source} send to {privateUser} (private): {privateMessage}.";
-                UpdateServerInformation(fullMessage);
-                SendPrivateMessage(fullMessage, source, messageContent[0]);
+                fullMessage = $"{source} says to {privateUser} (privately): {privateMessage}";
+
+                var userExists = CheckIfUserExists(privateUser);
+                if (userExists)
+                {
+                    UpdateServerInformation(fullMessage);
+                    SendPrivateMessage(fullMessage, source, messageContent[0]);
+                }
+                else
+                {
+                    SendServerPrivateMessage(ServerChatServiceConstants.USER_NOT_FOUND, source);
+                }
+
+                
             }
 
         }
 
-        public void SendPublicMessage(string message)
+        /// <summary>
+        /// Start the TCP Listener
+        /// </summary>
+        public void StartServer()
         {
-            StreamWriter swSenderSender;
+            IPAddress ipaLocal = IpAddress;
 
-            // Cria um array de clientes TCPs do tamanho do numero de clientes existentes
+            // Create a TCP Listener object using the IP and one specific port
+            TcpListener = new TcpListener(ipaLocal, 2502);
+
+            // Start the TCP Listener
+            TcpListener.Start();
+
+            IsServerRunning = true;
+
+            // Starta a new thread to Keep the Server running and accepting hte new connections
+            ThreadListener = new Thread(KeepServer);
+            ThreadListener.Start();
+        }
+
+        public void KeepServer()
+        {
+            while (IsServerRunning == true)
+            {
+                // Accept a new connection
+                var tcpClient = TcpListener.AcceptTcpClient();
+
+                // Create a new instance of connection
+                var newConnection = new ChatConnectionService(tcpClient, this);
+            }
+        }
+
+        #endregion
+
+        #region [ PRIVATE ]
+
+        /// <summary>
+        /// Send the message to all users in the Hash Table
+        /// </summary>
+        /// <param name="message"></param>
+        private void SendPublicMessage(string message)
+        {
+            StreamWriter SenderWriter;
+
+            // Creates a new array with the correct size (based on the Hash Table)
             TcpClient[] tcpClientes = new TcpClient[Users.Count];
 
-            // Copia os objetos TcpClient no array
+            // Copy all the objects from the Hash to the array
             Users.Values.CopyTo(tcpClientes, 0);
-            // Percorre a lista de clientes TCP
+
+            // For each element in the array, try to send the message
             for (int i = 0; i < tcpClientes.Length; i++)
             {
-                // Tenta enviar uma mensagem para cada cliente
                 try
                 {
-                    // Se a mensagem estiver em branco ou a conexão for nula sai...
                     if (message.Trim() == "" || tcpClientes[i] == null)
                     {
                         continue;
                     }
 
-                    // Envia a mensagem para o usuário atual no laço
-                    swSenderSender = new StreamWriter(tcpClientes[i].GetStream());
-                    swSenderSender.WriteLine(message);
-                    swSenderSender.Flush();
-                    swSenderSender = null;
+                    // Send the message to the user
+                    SenderWriter = new StreamWriter(tcpClientes[i].GetStream());
+                    SenderWriter.WriteLine(message);
+                    SenderWriter.Flush();
+                    SenderWriter = null;
                 }
-                catch // Se houver um problema , o usuário não existe , então remove-o
+                catch // If any problem, probably the user does not exists, so remove him
                 {
                     RemoveUser(tcpClientes[i]);
                 }
             }
         }
 
-        public void SendPrivateMessage(string message, string sourceUser, string destinationUser)
+        /// <summary>
+        /// Send Server message to Source user.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="sourceUser"></param>
+        private void SendServerPrivateMessage(string message, string sourceUser)
         {
-            StreamWriter swSenderSender;
+            StreamWriter SenderWriter;
 
-            var findDestinationUser = Users[destinationUser];
+            var findSourceUser = Users[sourceUser];
 
-            if(findDestinationUser != null && findDestinationUser is TcpClient)
+            if (findSourceUser != null && findSourceUser is TcpClient)
             {
-                var tcpClient = findDestinationUser as TcpClient;
+                var tcpClient = findSourceUser as TcpClient;
                 try
                 {
-
-                    // Se a mensagem estiver em branco ou a conexão for nula sai...
                     if (message.Trim() == "")
                     {
                         return;
                     }
 
-                    // Envia a mensagem para o usuário atual no laço
-                    swSenderSender = new StreamWriter(tcpClient.GetStream());
-                    swSenderSender.WriteLine(message);
-                    swSenderSender.Flush();
-                    swSenderSender = null;
+                    // Send the message to the source user that has sent
+                    SenderWriter = new StreamWriter(tcpClient.GetStream());
+                    SenderWriter.WriteLine(message);
+                    SenderWriter.Flush();
+                    SenderWriter = null;
                 }
                 catch (Exception ex)
                 {
                     RemoveUser(tcpClient);
                 }
-                
+
+            }
+
+        }
+
+
+        /// <summary>
+        /// Send private message to specific user, based on the message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="sourceUser"></param>
+        /// <param name="destinationUser"></param>
+        private void SendPrivateMessage(string message, string sourceUser, string destinationUser)
+        {
+            StreamWriter SenderWriter;
+
+            var findDestinationUser = Users[destinationUser];
+
+            if (findDestinationUser != null && findDestinationUser is TcpClient)
+            {
+                var tcpClient = findDestinationUser as TcpClient;
+                try
+                {
+
+                    if (message.Trim() == "")
+                    {
+                        return;
+                    }
+
+                    // Send the message to the specific user
+                    SenderWriter = new StreamWriter(tcpClient.GetStream());
+                    SenderWriter.WriteLine(message);
+                    SenderWriter.Flush();
+                    SenderWriter = null;
+                }
+                catch (Exception ex)
+                {
+                    RemoveUser(tcpClient);
+                }
+
             }
 
             var findSourceUser = Users[sourceUser];
@@ -172,18 +306,16 @@ namespace ChatService.Services
                 var tcpClient = findSourceUser as TcpClient;
                 try
                 {
-
-                    // Se a mensagem estiver em branco ou a conexão for nula sai...
                     if (message.Trim() == "")
                     {
                         return;
                     }
 
-                    // Envia a mensagem para o usuário atual no laço
-                    swSenderSender = new StreamWriter(tcpClient.GetStream());
-                    swSenderSender.WriteLine(message);
-                    swSenderSender.Flush();
-                    swSenderSender = null;
+                    // Send the message to the source user that has sent
+                    SenderWriter = new StreamWriter(tcpClient.GetStream());
+                    SenderWriter.WriteLine(message);
+                    SenderWriter.Flush();
+                    SenderWriter = null;
                 }
                 catch (Exception ex)
                 {
@@ -194,46 +326,41 @@ namespace ChatService.Services
 
         }
 
-        public void StartServer()
-        {
-            // Pega o IP do primeiro dispostivo da rede
-            IPAddress ipaLocal = IpAddress;
-
-            // Cria um objeto TCP listener usando o IP do servidor e porta definidas
-            TcpListener = new TcpListener(ipaLocal, 2502);
-
-            // Inicia o TCP listener e escuta as conexões
-            TcpListener.Start();
-
-            // O laço While verifica se o servidor esta rodando antes de checar as conexões
-            IsServerRunning = true;
-
-            // Inicia uma nova tread que hospeda o listener
-            ThreadListener = new Thread(KeepServer);
-            ThreadListener.Start();
-        }
-
-        public void KeepServer()
-        {
-            // Enquanto o servidor estiver rodando
-            while (IsServerRunning == true)
-            {
-                // Aceita uma conexão pendente
-                var tcpClient = TcpListener.AcceptTcpClient();
-                // Cria uma nova instância da conexão
-                var newConnection = new ChatConnectionService(tcpClient, this);
-            }
-        }
-
+        /// <summary>
+        /// Update Server Console
+        /// </summary>
+        /// <param name="message"></param>
         private void UpdateServerInformation(string message)
         {
             Console.WriteLine(message);
         }
 
+        /// <summary>
+        /// Update Server Console and All users
+        /// </summary>
+        /// <param name="message"></param>
         private void UpdateServerAndUsers(string message)
         {
             UpdateServerInformation(message);
             SendPublicMessage(message);
         }
+
+        /// <summary>
+        /// Check if user exists in the User Hash table
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        private bool CheckIfUserExists(string user)
+        {
+            var hashUser = Users[user];
+            if (hashUser == null)
+                return false;
+            else
+                return true;
+        }
+
+        #endregion
+
+        #endregion
     }
 }

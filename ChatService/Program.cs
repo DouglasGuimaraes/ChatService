@@ -34,7 +34,7 @@ namespace ChatService
             var nickname = SetWelcome(userAlreadyTaken);
 
             // Server connection
-            var connection = GetConnection(nickname);
+            var connection = GetConnection(nickname.ToUpper());
 
             if(!connection.Success && connection.UserAlreadyTaken)
             {
@@ -77,6 +77,10 @@ namespace ChatService
 
         #region [ PRIVATE METHODS ]
 
+        /// <summary>
+        /// Method responsible to add the DI in the project accessing the Dependency Injection Service
+        /// </summary>
+        /// <returns></returns>
         private static ServiceProvider RegisterDependencyInjection()
         {
             var serviceCollection = new ServiceCollection();
@@ -88,6 +92,7 @@ namespace ChatService
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             if (!userAlreadyTaken)
             {
+                Console.Clear();
                 Console.WriteLine("*** Welcome to our chat service!");
                 Console.WriteLine("*** Please set your nickname:");
             }
@@ -104,6 +109,11 @@ namespace ChatService
             return Console.ReadLine();
         }
 
+        /// <summary>
+        /// Create the connection with the server.
+        /// </summary>
+        /// <param name="nickname"></param>
+        /// <returns></returns>
         private static ChatConnectionResult GetConnection(string nickname)
         {
             var proxy = serviceProvider.GetService<IClientChatService>();
@@ -111,6 +121,10 @@ namespace ChatService
             return connection;
         }
 
+        /// <summary>
+        /// Send message to the server.
+        /// </summary>
+        /// <param name="message"></param>
         private static void SendMessage(string message)
         {
             try
@@ -118,7 +132,7 @@ namespace ChatService
                 if(!string.IsNullOrEmpty(message))
                 { 
                     var reservatedKey = CheckReservatedKey(message);
-    ;
+    
                     if (!reservatedKey)
                     { 
                         var proxy = serviceProvider.GetService<IClientChatService>();
@@ -128,12 +142,19 @@ namespace ChatService
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine("*** CONNECTION ERROR:");
                 Console.WriteLine(ex.Message);
+                Console.ResetColor();
             }
 
         }
 
+        /// <summary>
+        /// Check if the message was sent global or privatelly.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         private static ChatMessageConfiguration CheckMessageConfiguration(string message)
         {
             ChatMessageConfiguration result = null;
@@ -141,12 +162,12 @@ namespace ChatService
             try
             {
                 // User Message
-                var globalMessageCheck = message.Contains("/u");
+                var globalMessageCheck = message.StartsWith("/u");
+
                 // Private MEssage
-                var privateMessageCheck = message.Contains("/pu");
+                var privateMessageCheck = message.StartsWith("/pu");
 
                 // Global message
-
                 if (!globalMessageCheck && !privateMessageCheck)
                     result = new ChatMessageConfiguration(null, message, false);
 
@@ -154,7 +175,7 @@ namespace ChatService
                 if(globalMessageCheck)
                 {
                     var split = message.Split(" ");
-                    var user = split[1];
+                    var user = split[1].ToUpper();
                     var ind1 = message.IndexOf(' ');
                     var ind2 = message.IndexOf(' ', ind1 + 1);
                     var localMessage = message.Substring(ind2);
@@ -167,7 +188,7 @@ namespace ChatService
                 if(privateMessageCheck)
                 {
                     var split = message.Split(" ");
-                    var user = split[1];
+                    var user = split[1].ToUpper();
                     var ind1 = message.IndexOf(' ');
                     var ind2 = message.IndexOf(' ', ind1 + 1);
                     var localMessage = message.Substring(ind2);
@@ -185,6 +206,11 @@ namespace ChatService
             return result;
         }
 
+        /// <summary>
+        /// Check if the message contains some reserved key of the application.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         private static bool CheckReservatedKey(string message)
         {
             var helper = message.ToUpper().Contains(UserGuideConstants.HELP.ToUpper());
@@ -207,6 +233,7 @@ namespace ChatService
             {
                 var proxy = serviceProvider.GetService<IClientChatService>();
                 proxy.Disconnect();
+                Console.WriteLine("*** Thank you for using the chat. Bye!");
                 Environment.Exit(0);
 
             }

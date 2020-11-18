@@ -8,73 +8,84 @@ namespace ChatService.Services
 {
     public class ChatConnectionService
     {
+        #region [ FIELDS & PROPERTIES ]
+
         private readonly IServerChatService _serverChatService;
 
-        TcpClient tcpCliente;
-        // A thread que ira enviar a informação para o cliente
-        private Thread thrSender;
-        private StreamReader srReceptor;
-        private StreamWriter swEnviador;
-        private string usuarioAtual;
-        private string strResposta;
+        TcpClient TcpClient;
+        private Thread ThreadSender;
+        private StreamReader Reader;
+        private StreamWriter Writer;
+        private string UserInformation;
+        private string Response;
 
-        // O construtor da classe que que toma a conexão TCP
+        #endregion
+
+        #region [ CONSTRUCTOR ]
+
+        /// <summary>
+        /// The class Constructor that receives the new TCP Connection, accepting the new client and waiting
+        /// for the messages.
+        /// </summary>
+        /// <param name="tcpCon"></param>
+        /// <param name="serverChatService"></param>
         public ChatConnectionService(TcpClient tcpCon, IServerChatService serverChatService)
         {
-            tcpCliente = tcpCon;
-            // A thread que aceita o cliente e espera a mensagem
-            thrSender = new Thread(AcceptClient);
-            // A thread chama o método AceitaCliente()
-            thrSender.Start();
+            TcpClient = tcpCon;
+            
+            ThreadSender = new Thread(AcceptClient);
+
+            ThreadSender.Start();
 
             _serverChatService = serverChatService;
         }
 
-        private void CloseConnection()
-        {
-            // Fecha os objetos abertos
-            tcpCliente.Close();
-            srReceptor.Close();
-            swEnviador.Close();
-        }
+        #endregion
 
-        // Ocorre quando um novo cliente é aceito
+        #region [ METHODS ]
+
+        #region [ PRIVATE ]
+
+        /// <summary>
+        /// Accept the Client inserting him in the Server Hash Tables and starts
+        /// to listening user messages.
+        /// </summary>
         private void AcceptClient()
         {
-            srReceptor = new System.IO.StreamReader(tcpCliente.GetStream());
-            swEnviador = new System.IO.StreamWriter(tcpCliente.GetStream());
+            Reader = new System.IO.StreamReader(TcpClient.GetStream());
+            Writer = new System.IO.StreamWriter(TcpClient.GetStream());
 
-            // Lê a informação da conta do cliente
-            usuarioAtual = srReceptor.ReadLine();
+            // Read the user information
+            UserInformation = Reader.ReadLine();
 
-            // temos uma resposta do cliente
-            if (usuarioAtual != "")
+            // If the information exists
+            if (UserInformation != "")
             {
-                // Armazena o nome do usuário na hash table
-                if (ServerChatService.Users.Contains(usuarioAtual) == true)
+                // Check if the user already exists in the current connection
+                if (ServerChatService.Users.Contains(UserInformation) == true)
                 {
-                    // 0 => significa não conectado
-                    swEnviador.WriteLine("0|This is nickname already exists in the chat.");
-                    swEnviador.Flush();
+                    // 0: not connected
+                    Writer.WriteLine("0|This is nickname already exists in the chat.");
+                    Writer.Flush();
                     CloseConnection();
                     return;
                 }
-                else if (usuarioAtual == "Administrator")
+                else if (UserInformation == "Administrator")
                 {
-                    // 0 => não conectado
-                    swEnviador.WriteLine("0|Wow! You can't be the Administrator! hehe");
-                    swEnviador.Flush();
+                    // 0: not connected
+                    Writer.WriteLine("0|Wow! You can't be the Administrator! hehe");
+                    Writer.Flush();
                     CloseConnection();
                     return;
                 }
                 else
                 {
-                    // 1 => conectou com sucesso
-                    swEnviador.WriteLine("1");
-                    swEnviador.Flush();
+                    // 1: Connected successfully
+                    Writer.WriteLine("1");
+                    Writer.Flush();
 
-                    // Inclui o usuário na hash table e inicia a escuta de suas mensagens
-                    _serverChatService.AddUser(tcpCliente, usuarioAtual);
+                    // Add the user in the HashTable and starts the message listener
+                    _serverChatService.AddUser(TcpClient, UserInformation);
                 }
             }
             else
@@ -82,29 +93,41 @@ namespace ChatService.Services
                 CloseConnection();
                 return;
             }
-            //
+            
             try
             {
-                // Continua aguardando por uma mensagem do usuário
-                while ((strResposta = srReceptor.ReadLine()) != "")
+
+                // Still waiting for new user messages
+                while ((Response = Reader.ReadLine()) != "")
                 {
-                    // Se for inválido remove-o
-                    if (strResposta == null)
+                    // If invalid, remove the user
+                    if (Response == null)
                     {
-                        _serverChatService.RemoveUser(tcpCliente);
+                        _serverChatService.RemoveUser(TcpClient);
                     }
                     else
                     {
-                        // envia a mensagem para todos os outros usuários
-                        _serverChatService.SendMessage(usuarioAtual, strResposta);
+                        // If OK, send the message to the Server treatment
+                        _serverChatService.SendMessage(UserInformation, Response);
                     }
                 }
             }
             catch
             {
-                // Se houve um problema com este usuário desconecta-o
-                _serverChatService.RemoveUser(tcpCliente);
+                // If any problem with the user, user is disconnected
+                _serverChatService.RemoveUser(TcpClient);
             }
         }
+
+        private void CloseConnection()
+        {
+            TcpClient.Close();
+            Reader.Close();
+            Writer.Close();
+        }
+
+        #endregion
+
+        #endregion
     }
 }

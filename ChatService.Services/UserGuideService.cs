@@ -11,6 +11,10 @@ namespace ChatService.Services
             Console.WriteLine(GetHelpText());
         }
 
+        /// <summary>
+        /// Get the HELP text that will be showed in the Console
+        /// </summary>
+        /// <returns></returns>
         private string GetHelpText()
         {
             string helpText = string.Empty;

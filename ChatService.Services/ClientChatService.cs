@@ -11,6 +11,8 @@ namespace ChatService.Services
 {
     public class ClientChatService : IClientChatService
     {
+
+        #region [ FIELDS & PROPERTIES ]
         public string IpAddressNumber { get; set; }
         public StreamWriter Writer { get; set; }
         public StreamReader Reader { get; set; }
@@ -20,10 +22,20 @@ namespace ChatService.Services
         public bool Connected { get; set; }
         public bool UserAlreadyTaken { get; set; }
 
+        #endregion
+
+        #region [ CONSTRUCTOR ]
+
         public ClientChatService()
         {
             IpAddressNumber = "192.168.0.18";
         }
+
+        #endregion
+
+        #region [ METHODS ]
+
+        #region [ PUBLIC ]
 
         public ChatConnectionResult Connect(ChatUser user)
         {
@@ -31,23 +43,23 @@ namespace ChatService.Services
             try
             {
 
-                // Trata o endereço IP informado em um objeto IPAdress
+                // IP Address object based on the IP Address string
                 IpAddress = IPAddress.Parse(IpAddressNumber);
 
-                // Inicia uma nova conexão TCP com o servidor chat
+                // Initiate a new TCP connection with the server
                 TcpClient = new TcpClient();
                 TcpClient.Connect(IpAddressNumber, 2502);
 
-                // AJuda a verificar se estamos conectados ou não
+                // Property responsible to manage the connectivity
                 Connected = true;
 
 
-                // Envia o nome do usuário ao servidor
+                // Send the nickname to the server
                 Writer = new StreamWriter(TcpClient.GetStream());
                 Writer.WriteLine(user.Nickname);
                 Writer.Flush();
 
-                //Inicia a thread para receber mensagens e nova comunicação
+                // Starts a thread to receiving messages e new conversations
                 ThreadMessage = new Thread(new ThreadStart(GetMessages));
                 ThreadMessage.Start();
 
@@ -83,52 +95,65 @@ namespace ChatService.Services
             return result;
         }
 
+        /// <summary>
+        /// Send message to the server.
+        /// </summary>
+        /// <param name="message"></param>
         public void SendMessage(string message)
         {
             if (!string.IsNullOrEmpty(message))
-            {   //escreve a mensagem da caixa de texto
+            {   
                 Writer.WriteLine(message);
                 Writer.Flush();
             }
         }
 
+        #endregion
+
+        #region [ PRIVATE ]
+
+        /// <summary>
+        /// Get messages from the server.
+        /// </summary>
         private void GetMessages()
         {
-            // recebe a resposta do servidor
+            // Receive the response from the server
             var reader = new StreamReader(TcpClient.GetStream());
             string ConResposta = reader.ReadLine();
-            // Se o primeiro caracater da resposta é 1 a conexão foi feita com sucesso
+
+            // If the first character is 1, the connection was done successfully
             if (ConResposta[0] == '1')
             {
                 // Atualiza o formulário para informar que esta conectado
                 Console.WriteLine("Connected successfully to the chat!");
                 Connected = true;
             }
-            else // Se o primeiro caractere não for 1 a conexão falhou
+            else // If not so, connection was not successfully
             {
                 string reason = "Not connected: ";
-                // Extrai o motivo da mensagem resposta. O motivo começa no 3o caractere
+
+                // Get the reason
                 reason += ConResposta.Substring(2, ConResposta.Length - 2);
 
                 Connected = false;
 
+                // Check if the reason was based on the "User Already Taken" to restart the process
                 if(reason.Contains("This is nickname already exists in the chat"))
                     UserAlreadyTaken = true;
                 
-
-
-                // Sai do método
                 return;
             }
 
-            // Enquanto estiver conectado le as linhas que estão chegando do servidor
+            // While connected, show the messages in the Server Console
             while (Connected)
             {
-                // exibe mensagems no Textbox
                 var list = reader.ReadLine();
                 Console.WriteLine(list);
             }
         }
 
+        #endregion
+
+        #endregion
     }
 }

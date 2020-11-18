@@ -7,6 +7,11 @@ namespace ChatService.Services
 {
     public class DependencyInjectionService
     {
+        /// <summary>
+        /// Configure all services in the DI
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static ServiceProvider ConfigureServices(IServiceCollection services)
         {
             return
