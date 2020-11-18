@@ -13,6 +13,7 @@ namespace ChatService.Server
         {
             serviceProvider = RegisterDependencyInjection();
 
+            Console.Clear();
             Console.WriteLine("*** Server's starting...");
 
             StartServer();
@@ -39,6 +40,7 @@ namespace ChatService.Server
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine("*** Server started successfully.");
                 Console.ResetColor();
+                
             }
             catch (Exception ex)
             {

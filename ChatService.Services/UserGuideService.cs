@@ -29,13 +29,13 @@ namespace ChatService.Services
             sb.AppendLine("# SEND GLOBAL MESSAGE TO SPECIFIC USER #");
             sb.AppendLine("You need to identify the user and start the message with /u nickname and write your message after.");
             sb.AppendLine("Example: /u Maria Hey Maria, how are you doing?");
-            sb.AppendLine("This message will be sent publically to Maria.");
+            sb.AppendLine("This message will be sent publicaly to Maria.");
 
             sb.AppendLine("");
             sb.AppendLine("# SEND GLOBAL MESSAGE TO SPECIFIC USER #");
             sb.AppendLine("You need to identify the user and start the message with /pu nickname write your message after.");
             sb.AppendLine("Example: /pu Maria Hey Maria, how are you doing?");
-            sb.AppendLine("This message will be sent privatelly to Maria.");
+            sb.AppendLine("This message will be sent privately to Maria.");
 
             sb.AppendLine("");
             sb.AppendLine("You need to send the command: /exit and you will leave from the chat.");

@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using ChatService.Models.AbsModels.ChatConnection;
 using ChatService.Models.Models;
+using ChatService.Models.Constants.ServerChatService;
 using ChatService.Services.Interfaces;
 
 namespace ChatService.Services
@@ -27,7 +28,7 @@ namespace ChatService.Services
 
         public ClientChatService()
         {
-            IpAddressNumber = "192.168.0.18";
+            IpAddressNumber = ServerChatServiceConstants.MANUAL_IP;
         }
 
         #endregion
@@ -47,7 +48,7 @@ namespace ChatService.Services
 
                 // Initiate a new TCP connection with the server
                 TcpClient = new TcpClient();
-                TcpClient.Connect(IpAddressNumber, 2502);
+                TcpClient.Connect(IpAddressNumber, ServerChatServiceConstants.SERVER_PORT);
 
                 // Property responsible to manage the connectivity
                 Connected = true;

@@ -1,100 +1,117 @@
 using System;
+using System.Threading;
+using System.Reflection;
 using ChatService.Services;
 using ChatService.Services.Interfaces;
+using ChatService.Models.Constants.ServerChatService;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-
 namespace ChatService.Tests
 {
     public class ClientChatServiceTests
     {
 
         private static ServiceProvider serviceProvider;
+        private readonly IServerChatService serverChatService;
 
         public ClientChatServiceTests()
         {
             var serviceCollection = new ServiceCollection();
             serviceProvider = DependencyInjectionService.ConfigureServicesTransient(serviceCollection);
+
+            serverChatService = serviceProvider.GetService<IServerChatService>();
+            serverChatService.StartServer();
         }
 
-        //[Theory]
-        //[InlineData("192.168.0.18")]
-        //public void ServerConnect_SuccessTest(string ipAddress)
-        //{
-        //    var service = serviceProvider.GetService<IClientChatService>();
+        #region [ SERVER CONNECTION ]
 
-        //    service.IpAddressNumber = ipAddress;
+        [Theory]
+        [InlineData(ServerChatServiceConstants.MANUAL_IP)]
+        public void ServerConnect_SuccessTest(string ipAddress)
+        {
+            var clientService = serviceProvider.GetService<IClientChatService>();
 
-        //    var connect = service.Connect(new Models.Models.ChatUser { Nickname = Guid.NewGuid().ToString() });
+            clientService.IpAddressNumber = ipAddress;
 
-        //    Assert.True(connect.Success);
-        //}
+            var nickname = MethodBase.GetCurrentMethod().Name;
 
-        //[Fact]
-        //public void ServerConnect_FailTest()
-        //{
-        //    var service = serviceProvider.GetService<IClientChatService>();
+            var connect = clientService.Connect(new Models.Models.ChatUser { Nickname = nickname });
 
-        //    // Force error
-        //    service.IpAddressNumber = "";
+            Assert.True(connect.Success);
+        }
 
-        //    var connect = service.Connect(new Models.Models.ChatUser { Nickname = Guid.NewGuid().ToString() });
+        [Fact]
+        public void ServerConnect_FailTest()
+        {
+            var clientService = serviceProvider.GetService<IClientChatService>();
 
-        //    service.Disconnect();
+            // Force error
+            clientService.IpAddressNumber = "";
 
-        //    Assert.False(connect.Success);
-        //}
+            var nickname = MethodBase.GetCurrentMethod().Name;
 
-        //[Fact]
-        //public void ServerConnect_SameNicknameValidation_SuccessTest()
-        //{
-        //    var service = serviceProvider.GetService<IClientChatService>();
+            var connect = clientService.Connect(new Models.Models.ChatUser { Nickname = nickname });
 
-        //    var nickname = Guid.NewGuid().ToString();
+            Assert.False(connect.Success);
+        }
 
-        //    var connect = service.Connect(new Models.Models.ChatUser { Nickname = nickname });
-        //    var connect2 = service.Connect(new Models.Models.ChatUser { Nickname = nickname });
+        #endregion
 
-        //    service.Disconnect();
-
-        //    Assert.False(connect2.Success);
-        //}
+        #region [ MESSAGES ]
 
         [Fact]
         public void SendMessage_SuccessTest()
         {
-            var service = serviceProvider.GetService<IClientChatService>();
-            var connect = service.Connect(new Models.Models.ChatUser { Nickname = Guid.NewGuid().ToString() });
-            var message = service.SendMessage("Test message.");
+            var clientService = serviceProvider.GetService<IClientChatService>();
+
+            var nickname = MethodBase.GetCurrentMethod().Name;
+
+            var connect = clientService.Connect(new Models.Models.ChatUser { Nickname = nickname });
+            var message = clientService.SendMessage("Test message.");
 
             Assert.True(message.Success);
         }
 
-        //[Fact]
-        //public void SendMessage_FailTest()
-        //{
-        //    var service = serviceProvider.GetService<IClientChatService>();
-        //    var connect = service.Connect(new Models.Models.ChatUser { Nickname = Guid.NewGuid().ToString() });
+        [Fact]
+        public void SendMessage_GlobalUser_SuccessTest()
+        {
+            var clientService = serviceProvider.GetService<IClientChatService>();
 
-        //    // Force disconnect and messge will be not sent
-        //    service.Disconnect();
+            var nickname = MethodBase.GetCurrentMethod().Name;
 
-        //    var message = service.SendMessage("Test message.");
+            var connect = clientService.Connect(new Models.Models.ChatUser { Nickname = nickname });
+            var message = clientService.SendMessage($"{nickname}|||Test Message Global User.");
 
-        //    Assert.False(message.Success);
-        //}
+            Assert.True(message.Success);
+        }
 
-        //[Fact]
-        //public void SendMessage_EmptyMessage_SuccessTest()
-        //{
-        //    var service = serviceProvider.GetService<IClientChatService>();
-        //    var connect = service.Connect(new Models.Models.ChatUser { Nickname = Guid.NewGuid().ToString() });
+        [Fact]
+        public void SendMessage_PrivateUser_SuccessTest()
+        {
+            var clientService = serviceProvider.GetService<IClientChatService>();
 
-        //    var message = service.SendMessage("");
+            var nickname = MethodBase.GetCurrentMethod().Name;
 
-        //    service.Disconnect();
+            var connect = clientService.Connect(new Models.Models.ChatUser { Nickname = nickname });
+            var message = clientService.SendMessage($"{nickname}|||Test Message Private User.|||private");
 
-        //    Assert.False(message.Success);
-        //}
+            Assert.True(message.Success);
+        }
+
+        [Fact]
+        public void SendMessage_EmptyMessage_SuccessTest()
+        {
+            var clientService = serviceProvider.GetService<IClientChatService>();
+
+            var nickname = MethodBase.GetCurrentMethod().Name;
+
+            var connect = clientService.Connect(new Models.Models.ChatUser { Nickname = nickname });
+
+            var message = clientService.SendMessage("");
+
+            Assert.False(message.Success);
+        }
+
+        #endregion
     }
 }
