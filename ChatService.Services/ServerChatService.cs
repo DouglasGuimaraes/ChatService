@@ -95,7 +95,7 @@ namespace ChatService.Services
                 string privateMessage = messageContent[1];
                 fullMessage = $"{source} send to {privateUser} (private): {privateMessage}.";
                 UpdateServerInformation(fullMessage);
-                SendPrivateMessage(fullMessage, messageContent[0]);
+                SendPrivateMessage(fullMessage, source, messageContent[0]);
             }
 
         }
@@ -134,15 +134,15 @@ namespace ChatService.Services
             }
         }
 
-        public void SendPrivateMessage(string message, string user)
+        public void SendPrivateMessage(string message, string sourceUser, string destinationUser)
         {
             StreamWriter swSenderSender;
 
-            var findUser = Users[user];
+            var findDestinationUser = Users[destinationUser];
 
-            if(findUser != null && findUser is TcpClient)
+            if(findDestinationUser != null && findDestinationUser is TcpClient)
             {
-                var tcpClient = findUser as TcpClient;
+                var tcpClient = findDestinationUser as TcpClient;
                 try
                 {
 
@@ -164,10 +164,34 @@ namespace ChatService.Services
                 }
                 
             }
-            else
+
+            var findSourceUser = Users[sourceUser];
+
+            if (findSourceUser != null && findSourceUser is TcpClient)
             {
-                
+                var tcpClient = findSourceUser as TcpClient;
+                try
+                {
+
+                    // Se a mensagem estiver em branco ou a conexão for nula sai...
+                    if (message.Trim() == "")
+                    {
+                        return;
+                    }
+
+                    // Envia a mensagem para o usuário atual no laço
+                    swSenderSender = new StreamWriter(tcpClient.GetStream());
+                    swSenderSender.WriteLine(message);
+                    swSenderSender.Flush();
+                    swSenderSender = null;
+                }
+                catch (Exception ex)
+                {
+                    RemoveUser(tcpClient);
+                }
+
             }
+
         }
 
         public void StartServer()
