@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatService.Models", "ChatS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatService.Services", "ChatService.Services\ChatService.Services.csproj", "{817C4B88-EB28-4C10-9A9E-EE24D717758B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatService.Server", "ChatService.Server\ChatService.Server.csproj", "{2A21997B-E877-4543-80B4-65584729D07A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatService.Infra", "ChatService.Infra\ChatService.Infra.csproj", "{F419B343-47FD-4F8F-AFFA-03DA83F96C47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatService.Tests", "ChatService.Tests\ChatService.Tests.csproj", "{5B282AA7-27FA-4BBC-A791-E5D766F7283C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +31,17 @@ Global
 		{817C4B88-EB28-4C10-9A9E-EE24D717758B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{817C4B88-EB28-4C10-9A9E-EE24D717758B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{817C4B88-EB28-4C10-9A9E-EE24D717758B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A21997B-E877-4543-80B4-65584729D07A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A21997B-E877-4543-80B4-65584729D07A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A21997B-E877-4543-80B4-65584729D07A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A21997B-E877-4543-80B4-65584729D07A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F419B343-47FD-4F8F-AFFA-03DA83F96C47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F419B343-47FD-4F8F-AFFA-03DA83F96C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F419B343-47FD-4F8F-AFFA-03DA83F96C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F419B343-47FD-4F8F-AFFA-03DA83F96C47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B282AA7-27FA-4BBC-A791-E5D766F7283C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B282AA7-27FA-4BBC-A791-E5D766F7283C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B282AA7-27FA-4BBC-A791-E5D766F7283C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B282AA7-27FA-4BBC-A791-E5D766F7283C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
