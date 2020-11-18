@@ -8,17 +8,17 @@ Projeto de chat (cliente x servidor) utilizando o protocolo TCP para as conexõe
 
 Dentre as funcionalidades básicas solicitadas, todas foram atendidas:
 
-- Registro de apelido
-- Envio de mensagem pública para a sala
-- Envio de mensagem pública para um usuário
-- Sair do bate-papo
+- Registro de apelido :white_check_mark:
+- Envio de mensagem pública para a sala :white_check_mark:
+- Envio de mensagem pública para um usuário :white_check_mark:
+- Sair do bate-papo :white_check_mark:
 
 Dentre as opcionais, as duas primeiras não foram implementadas:
 
-- Criação de nova sala
-- Trocar de sala
-- Ajuda ao usuário (sobre os comandos)
-- Enviar uma mensagem privada para um usuário da sala
+- Criação de nova sala :x:
+- Trocar de sala :x:
+- Ajuda ao usuário (sobre os comandos) :white_check_mark:
+- Enviar uma mensagem privada para um usuário da sala :white_check_mark:
 
 ## Arquitetura do Projeto
 
