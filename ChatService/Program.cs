@@ -22,20 +22,32 @@ namespace ChatService
 
         static void Main(string[] args)
         {
-
+            
             // Service Provider
             serviceProvider = RegisterDependencyInjection();
 
+            bool userAlreadyTaken = false;
+            if(args.Count() == 1)
+                userAlreadyTaken = true;
+
             // Welcome and User Nickname
-            var nickname = SetWelcome();
+            var nickname = SetWelcome(userAlreadyTaken);
 
             // Server connection
             var connection = GetConnection(nickname);
 
-            if (connection.Success)
+            if(!connection.Success && connection.UserAlreadyTaken)
             {
-                Console.WriteLine("*** User the command /help to list all the commands available to you.");
-                Console.WriteLine("*** SEND YOUR MESSAGE:");
+                Program.Main(new string[] { "UserAlreadyTaken" });
+            }
+            else if (connection.Success)
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("*** Welcome to the chat! ***");
+                Console.WriteLine("*** Use the /help command to list all the commands available to you.");
+                Console.ResetColor();
+                
                 while (true)
                 {
                     var userMessage = Console.ReadLine();
@@ -71,10 +83,24 @@ namespace ChatService
             return DependencyInjectionService.ConfigureServices(serviceCollection);
         }
 
-        private static string SetWelcome()
+        private static string SetWelcome(bool userAlreadyTaken = false)
         {
-            Console.WriteLine("*** Welcome to our chat service!");
-            Console.WriteLine("*** Please set your nickname:");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            if (!userAlreadyTaken)
+            {
+                Console.WriteLine("*** Welcome to our chat service!");
+                Console.WriteLine("*** Please set your nickname:");
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("*** Welcome to our chat service!");
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine("*** Nickname is already taken.");
+                Console.WriteLine("*** Please set other nickname:");
+            }
+
+            Console.ResetColor();
             return Console.ReadLine();
         }
 
@@ -89,12 +115,15 @@ namespace ChatService
         {
             try
             {
-                var reservatedKey = CheckReservatedKey(message);
-;
-                if (!reservatedKey)
+                if(!string.IsNullOrEmpty(message))
                 { 
-                    var proxy = serviceProvider.GetService<IClientChatService>();
-                    proxy.SendMessage(message);
+                    var reservatedKey = CheckReservatedKey(message);
+    ;
+                    if (!reservatedKey)
+                    { 
+                        var proxy = serviceProvider.GetService<IClientChatService>();
+                        proxy.SendMessage(message);
+                    }
                 }
             }
             catch (Exception ex)
@@ -162,14 +191,15 @@ namespace ChatService
             if (helper)
             {
                 var proxy = serviceProvider.GetService<IUserGuideService>();
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("");
                 Console.WriteLine(" > HELP command:");
                 proxy.Help();
 
                 Console.WriteLine("");
                 Console.WriteLine(" > END of HELP command:");
-                Console.WriteLine(" > Type any key to back to the chat.");
-                Console.ReadKey();
+                Console.WriteLine("");
+                Console.ResetColor();
             }
 
             var exit = message.ToUpper().Contains(UserGuideConstants.EXIT.ToUpper());
@@ -177,6 +207,8 @@ namespace ChatService
             {
                 var proxy = serviceProvider.GetService<IClientChatService>();
                 proxy.Disconnect();
+                Environment.Exit(0);
+
             }
 
             return helper || exit;

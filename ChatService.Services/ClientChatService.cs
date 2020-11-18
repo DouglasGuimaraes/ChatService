@@ -18,6 +18,7 @@ namespace ChatService.Services
         public Thread ThreadMessage { get; set; }
         public IPAddress IpAddress { get; set; }
         public bool Connected { get; set; }
+        public bool UserAlreadyTaken { get; set; }
 
         public ClientChatService()
         {
@@ -50,7 +51,9 @@ namespace ChatService.Services
                 ThreadMessage = new Thread(new ThreadStart(GetMessages));
                 ThreadMessage.Start();
 
-                result = new ChatConnectionResult(true);
+                Thread.Sleep(2000);
+
+                result = new ChatConnectionResult(Connected, UserAlreadyTaken);
             }
             catch (Exception ex)
             {
@@ -99,14 +102,21 @@ namespace ChatService.Services
             {
                 // Atualiza o formulário para informar que esta conectado
                 Console.WriteLine("Connected successfully to the chat!");
+                Connected = true;
             }
             else // Se o primeiro caractere não for 1 a conexão falhou
             {
                 string reason = "Not connected: ";
                 // Extrai o motivo da mensagem resposta. O motivo começa no 3o caractere
                 reason += ConResposta.Substring(2, ConResposta.Length - 2);
-                // Atualiza o formulário como o motivo da falha na conexão
-                Console.WriteLine(reason);
+
+                Connected = false;
+
+                if(reason.Contains("This is nickname already exists in the chat"))
+                    UserAlreadyTaken = true;
+                
+
+
                 // Sai do método
                 return;
             }
