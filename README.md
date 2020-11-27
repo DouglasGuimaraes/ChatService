@@ -4,28 +4,6 @@
 
 Projeto de chat (cliente x servidor) utilizando o protocolo TCP para as conexões.
 
-### Funcionalidades
-
-Dentre as funcionalidades básicas solicitadas, todas foram atendidas:
-
-- Registro de apelido :white_check_mark:
-- Envio de mensagem pública para a sala :white_check_mark:
-- Envio de mensagem pública para um usuário :white_check_mark:
-- Sair do bate-papo :white_check_mark:
-
-Dentre as opcionais, as duas primeiras não foram implementadas:
-
-- Criação de nova sala :x:
-- Trocar de sala :x:
-- Ajuda ao usuário (sobre os comandos) :white_check_mark:
-- Enviar uma mensagem privada para um usuário da sala :white_check_mark:
-
-## Arquitetura do Projeto
-
-Os respectivos projetos foram criados utilizando .Net Core 3.1.
-
-Optei pelo tipo de projeto Console.
-
 ### Camadas
 
 - **ChatService:** camada responsável pela aplicação Console no lado do Cliente.
